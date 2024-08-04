@@ -70,16 +70,19 @@ def main():
             print(f"Breath segment {start} to {end} is empty.")
             continue
         pef = estimate_pef_from_amplitude(breath_segment)
-        pefs.append(pef)
+        pefs.append((pef, start, end))
+
+    # PEF 값을 기준으로 내림차순 정렬하여 상위 3개 값 선택
+    top_pefs = sorted(pefs, key=lambda x: x[0], reverse=True)[:3]
+    top_pefs = sorted(top_pefs, key=lambda x: x[1])  # 측정 순서대로 정렬
 
     # 결과 출력 및 가장 높은 PEF 계산
-    max_pef = 0
-    for i, pef in enumerate(pefs):
-        print(f"Breath {i + 1}: Estimated Peak Expiratory Flow (PEF) = {pef:.2f} L/min")
-        if pef > max_pef:
-            max_pef = pef
+    for i, (pef, start, end) in enumerate(top_pefs):
+        print(f"Breath {i + 1}: Estimated Peak Expiratory Flow (PEF) = {pef:.2f} L/min, Start: {start}, End: {end}")
 
-    print(f"Highest Estimated Peak Expiratory Flow (PEF) = {max_pef:.2f} L/min")
+    print(f"Top 3 Estimated Peak Expiratory Flow (PEF) values:")
+    for i, (pef, start, end) in enumerate(top_pefs):
+        print(f"{i + 1}. PEF = {pef:.2f} L/min")
 
     # 호흡 구간 시각화
     plt.figure(figsize=(14, 5))
